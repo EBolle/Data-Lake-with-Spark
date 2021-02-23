@@ -10,3 +10,6 @@ plus the tradeoff between long writes versus a clean datalake schema.
 E.g., for the songs table I cut the number of partitions from 466 to 8 since the overhead is not worth it with
 these small amounts of data.
 - Perhaps show some graphs of skew? 
+- Why use cache? 
+
+Explain the songs_df return / function parameter -> events_df as help table etc.
