@@ -21,9 +21,9 @@ def main():
     Main execution method which sequentially calls the methods to execute the full Sparify ETL pipeline:
     - Get or create a Spark session
     - Extract the raw .json song data from S3
-    - Transform the song data into 2 tables - songs and artists - and Load these tables back into S3 in parquet format
+    - Transform the song data into 2 folders - songs and artists - and Load these tables back into S3 in parquet format
     - Extract the raw .json log data from S3
-    - Transform the song data into 3 tables - time, users, and songplays - and Load these tables back into S3 in parquet format
+    - Transform the log data into 3 folders - time, users, and songplays - and Load these tables back into S3 in parquet format
     - stop the spark session
     """
     spark = create_spark_session()
