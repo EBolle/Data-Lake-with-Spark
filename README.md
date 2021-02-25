@@ -20,8 +20,8 @@ project is an example of those.
 This project **extracts** raw .json data from S3, **transforms** it with Spark on a AWS EMR cluster, and **loads**
 it back in S3 in parquet format, in detail:
 
-- Raw .json song data is transformed into 2 folders - songs and artists - in parquet format
-- Raw .json log data is transformed into 3 folders - time, users, and songplays - in parquet format
+- Raw .json song data is transformed into 2 tables - songs and artists - in parquet format
+- Raw .json log data is transformed into 3 tables - time, users, and songplays - in parquet format
 
 ### Requirements
 
