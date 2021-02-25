@@ -82,10 +82,10 @@ If you want to track and inspect the progress and jobs via the Spark-UI, you hav
 terminal as follows:
 
 ```bash
-aws emr socks --cluster-id <your_cluster_id>--key-pair-file <location to your .pem file>
+aws emr socks --cluster-id <your_cluster_id> --key-pair-file <location to your .pem file>
 ```
 
-Next, navigate to http://<master-public-dns-name>:18080 and follow the action. Note that you have to configure your
+Next, navigate to `http://<master-public-dns-name>:18080` and follow the action. Note that you have to configure your
 browser proxy settings as well, more information can be found [here](https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-ssh-tunnel.html)
 and [here](https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-connect-master-node-proxy.html).
 
