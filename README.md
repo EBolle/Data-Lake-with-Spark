@@ -17,8 +17,8 @@ project is an example of those.
 
 ### ETL
 
-This project **extracts** raw .json data from S3, **transforms** it on a Spark cluster running on AWS EMR, and **loads**
-it in S3 in parquet format, in detail:
+This project **extracts** raw .json data from S3, **transforms** it with Spark on a AWS EMR cluster, and **loads**
+it back in S3 in parquet format, in detail:
 
 - Raw .json song data is transformed into 2 folders - songs and artists - in parquet format
 - Raw .json log data is transformed into 3 folders - time, users, and songplays - in parquet format
@@ -40,36 +40,46 @@ aws emr create-cluster \
 --auto-scaling-role EMR_AutoScaling_DefaultRole \
 --applications Name=Hadoop Name=Spark \
 --ebs-root-volume-size 10 \
---service-role EMR_DefaultRole
---ec2-attributes KeyName=<your permission key name>
---release-label emr-5.32.0
---name 'spark-cluster' 
---scale-down-behavior TERMINATE_AT_TASK_COMPLETION 
+--service-role EMR_DefaultRole \
+--ec2-attributes KeyName=<your permission key name> \
+--release-label emr-5.32.0 \
+--name 'spark-cluster' \
+--scale-down-behavior TERMINATE_AT_TASK_COMPLETION \
 --region us-west-2
 ```
 
 ### Instructions
 
-Once your cluster is running, you need to do 5 things to actually start the ETL process:
+Once your cluster is running, you need to do a couple of things to actually start the ETL process:
+- modify the S3 bucket location in dl.cfg
+- upload dl.cfg, etl.py, and schemas.py to a folder on a S3 bucket of your choice
 - make sure you add an inbound security rule to allow ssh access to the cluster on your local ip address ([more info](https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-connect-master-node-ssh.html))
 - connect to the cluster via a private key pair
-- copy dl.cfg, etl.py and schema.py to the cluster [check out JARS]
-- locate spark-submit via ```which spark-submit``` 
-- execute etl.py
-
-Connect to the cluster via a private key pair:
 
 ```bash
 ssh -i <location to your .pem file> hadoop@<master-public-dns-name>
 ```
+- create a folder and move into the folder
 
-Execute etl.py:
+```bash
+mkdir spark_app
+cd spark_app
+``` 
+
+- sync the S3 folder with the scripts
+
+ ```bash
+ aws s3 sync s3://<your bucket>/<your folder with scripts> .
+```
+
+- execute etl.py
 
 ```bash
 /usr/bin/spark-submit --master yarn --conf spark.dynamicAllocation.enabled=true etl.py
 ```
 
-If you want to track and inspect the progress and jobs via the Spark-UI, you have to set up a ssh-tunnel as follows:
+If you want to track and inspect the progress and jobs via the Spark-UI, you have to set up an ssh-tunnel in a new
+terminal as follows:
 
 ```bash
 aws emr socks --cluster-id <your_cluster_id>--key-pair-file <location to your .pem file>

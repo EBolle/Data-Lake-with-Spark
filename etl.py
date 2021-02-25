@@ -11,9 +11,9 @@ from schemas import log_schema, song_schema
 config = configparser.ConfigParser()
 config.read('dl.cfg')
 
-song_data_path = config['PATHS]['song_data_path']
-log_data_path = config['PATHS]['log_data_path']
-output_data_path = config['PATHS]['output_data_path']
+song_data_path = config['PATHS']['song_data_path']
+log_data_path = config['PATHS']['log_data_path']
+output_data_path = config['PATHS']['output_data_path']
 
 
 def main():
