@@ -1,3 +1,6 @@
+"""Main script which executes the full ETL pipeline."""
+
+
 import configparser
 from pyspark.sql import SparkSession
 from pyspark.sql.dataframe import DataFrame
@@ -47,7 +50,17 @@ def create_spark_session():
 
 
 def process_song_data(spark, input_data: str, output_data: str, schema: StructType) -> DataFrame:
-    """Extract the raw data from S3, transform the data to our likings, and load it back into S3 in parquet format."""
+    """
+    Extract the raw data from S3, transform the data to our likings, and load it back into S3 in parquet format.
+
+    Arguments:
+        spark: An active Spark connection.
+        input_data: Path to the S3 bucket with input data.
+        output_data: Path to the S3 bucket where the transformed data is going to be stored.
+        schema: DataFrame schema of the song data .json files.
+    Returns:
+        songs_df: This dataframe is needed in the process_log_data function, hence it is returned here.
+    """
     song_data = spark.read.json(path=song_data_path, schema=song_schema)
 
     song_data_cached = song_data.repartition(8).cache()
@@ -56,6 +69,7 @@ def process_song_data(spark, input_data: str, output_data: str, schema: StructTy
     songs_df = (song_data_cached
         .select(['song_id', 'title', 'artist_id', 'year', 'duration'])
         .repartition(8, 'year', 'artist_id')
+        .dropDuplicates(['song_id'])
     )
 
     songs_df_write = (songs_df
@@ -71,9 +85,7 @@ def process_song_data(spark, input_data: str, output_data: str, schema: StructTy
                 col('artist_location').alias('location'),
                 col('artist_latitude').alias('latitude'),
                 col('artist_longitude').alias('longitude'))
-        .withColumn('row_number', sql_f.row_number().over(Window.partitionBy('artist_id').orderBy('name')))
-        .where('row_number = 1')
-        .drop('row_number')
+        .dropDuplicates(['artist_id'])
     )
 
     artists_df_write = (artists_df
@@ -91,7 +103,18 @@ def process_log_data(spark,
                      output_data: str,
                      schema: StructType,
                      songs_df: DataFrame) -> None:
-    """Extract the raw data from S3, transform the data to our likings, and load it back into S3 in parquet format."""
+    """
+    Extract the raw data from S3, transform the data to our likings, and load it back into S3 in parquet format.
+
+    Arguments:
+        spark: An active Spark connection.
+        input_data: Path to the S3 bucket with input data.
+        output_data: Path to the S3 bucket where the transformed data is going to be stored.
+        schema: DataFrame schema of the log data .json files.
+        songs_df: DataFrame from the song_data function which is needed to create the songplays table.
+    Returns:
+        None.
+    """
     log_data = spark.read.json(path=log_data_path, schema=log_schema)
 
     log_data_cached = log_data.repartition(8).cache()
