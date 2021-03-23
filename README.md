@@ -1,10 +1,4 @@
-## Data lake with Spark
-
-<img src="https://images.pexels.com/photos/4432160/pexels-photo-4432160.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940" height="400">
-
-Source: https://www.pexels.com
-
-### Why Spark?
+# Data lake with Spark
 
 After moving to the powerful AWS Redshift datawarehouse in the cloud, one could wonder why we want to switch to Spark. 
 Currently, the main reason is that Sparkify is planning to start using advanced analytics and machine learning. While
@@ -15,7 +9,7 @@ on massive amounts of data.
 To get acquainted with Spark as fast as possible we have decided to run most of the ETL jobs on Spark clusters, and this
 project is an example of those.
 
-### ETL
+## ETL
 
 This project **extracts** raw .json data from S3, **transforms** it with Spark on a AWS EMR cluster, and **loads**
 it back in S3 in parquet format, in detail:
@@ -23,15 +17,16 @@ it back in S3 in parquet format, in detail:
 - Raw .json song data is transformed into 2 tables - songs and artists - in parquet format
 - Raw .json log data is transformed into 3 tables - time, users, and songplays - in parquet format
 
-### Requirements
+## Requirements
 
 To replicate the project you need to activate 3 AWS services / tools:
-- AWS CLI version 2, more information can be found [here](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
+
+- AWS CLI version 2, more information can be found [here][cli_version_2]
 - An EMR cluster with Spark installed and configured
 - An S3 bucket
 
 To avoid cross-region data transfer fees, make sure your S3 bucket is in the same regio as the EMR cluster, more 
-information can be found [here](https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-plan-region.html).
+information can be found [here][s3_info].
 
 This project was tested and validated with the following EMR settings:
 
@@ -48,12 +43,13 @@ aws emr create-cluster \
 --region us-west-2
 ```
 
-### Instructions
+## Instructions
 
 Once your cluster is running, you need to do a couple of things to actually start the ETL process:
+
 - modify the S3 bucket location in dl.cfg
 - upload dl.cfg, etl.py, and schemas.py to a folder on a S3 bucket of your choice
-- make sure you add an inbound security rule to allow ssh access to the cluster on your local ip address ([more info](https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-connect-master-node-ssh.html))
+- make sure you add an inbound security rule to allow ssh access to the cluster on your local ip address ([more info][ssh_master_node])
 - connect to the cluster via a private key pair
 
 ```bash
@@ -86,10 +82,9 @@ aws emr socks --cluster-id <your_cluster_id> --key-pair-file <location to your .
 ```
 
 Next, navigate to `http://<master-public-dns-name>:18080` and follow the action. Note that you have to configure your
-browser proxy settings as well, more information can be found [here](https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-ssh-tunnel.html)
-and [here](https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-connect-master-node-proxy.html).
+browser proxy settings as well, more information can be found [here][emr_ssh_tunnel] and [here][emr_master_node].
 
-### Small data
+## Small data
 
 Please note that the current input data on the S3 buckets is *very* small in size. This is due to the fact that this
 project is part of an educational program. As a consequence, some of the 'optimizations' in the code do not make sense
@@ -103,9 +98,12 @@ more time to write the files when using this partition strategy
 more efficiently
 - broadcast the smaller songs_df dataframe to each executor when joining with the events_df dataframe to avoid shuffling
 
-In the final capstone project I will put these insights and further configuration settings of the SparkSession into
-practice on much higher volumes of data.
-
-### Contact
+## Contact
 
 In case of suggestions or remarks please contact the Data Engineering department.
+
+[cli_version_2]: https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html
+[s3_info]: https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-plan-region.html
+[ssh_master_node]: https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-connect-master-node-ssh.html
+[emr_ssh_tunnel]: https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-ssh-tunnel.html
+[emr_master_node]: https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-connect-master-node-proxy.html
